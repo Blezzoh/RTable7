@@ -1,16 +1,18 @@
 import React from "react";
-import { Table } from "react-bootstrap";
-import { useTable, useSortBy, useFilters, useGlobalFilter } from "react-table";
+import { useTable, useSortBy, useFilters, useGlobalFilter, useFlexLayout, useResizeColumns, useExpanded } from "react-table";
 import CustomInput from "./CustomInput";
+import { rt7Expander } from './randomData'
 
-window.Date.prototype.isValid = function() {
+window.Date.prototype.isValid = function () {
   // An invalid date object returns NaN for getTime() and NaN is the only
   // object not strictly equal to itself.
   // eslint-disable-next-line
   return this.getTime() === this.getTime();
 };
+
 // value and onChange function
 const GlobalFilter = ({ globalFilter, setGlobalFilter }) => {
+  console.log(setGlobalFilter, 'global filter')
   return (
     <CustomInput
       value={globalFilter || ""}
@@ -38,8 +40,11 @@ const ColumnFilter = ({ column: { filterValue, setFilter, filter } }) => {
  * As in the previous versions, any react table needs colums where at the core we have a field Header, and accessor
  * As in the previous versions, a react table has data that consist of an array of JSONs
  */
-const ReactTable = ({ columns, data }) => {
+const ReactTable = ({ columns, data, renderRowSubComponent, isExpandable }) => {
   // functions to run when a column is filtered depending on the type
+  if (isExpandable) {
+    columns = [rt7Expander, ...columns]
+  }
   const filterTypes = {
     year: (rows, id, filterValue) => {
       return rows.filter(row => {
@@ -57,25 +62,26 @@ const ReactTable = ({ columns, data }) => {
         const rowValue = row.values[id];
         return rowValue !== undefined
           ? String(rowValue)
-              .toLowerCase()
-              .startsWith(String(filterValue).toLowerCase())
+            .toLowerCase()
+            .startsWith(String(filterValue).toLowerCase())
           : true;
       });
     }
   };
-  const defaultColumn = {
+  const defaultColumn = React.useMemo(() => ({
     // Let's set up our default Filter UI
-    Filter: ColumnFilter
-  };
+    Filter: ColumnFilter,
+    minWidth: 10,
+    maxWidth: 400
+  }), [])
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
     prepareRow,
-    state,
+    state: { globalFilter },
     setGlobalFilter,
-    visibleColumns
   } = useTable(
     {
       columns,
@@ -83,29 +89,31 @@ const ReactTable = ({ columns, data }) => {
       defaultColumn,
       filterTypes
     },
-    // hook for filters
+    // hooks for filters
     useFilters,
     useGlobalFilter,
     // hook for sorting
-    useSortBy
+    useSortBy,
+    // hooks for resizing
+    useFlexLayout,
+    useResizeColumns,
+    // hooks for exander,
+    useExpanded
   );
-  console.log(visibleColumns);
   return (
     <div>
       <div
         className="p-1 border-0 d-flex justify-content-end"
-        colSpan={visibleColumns.length}
       >
         <GlobalFilter
-          globalFilter={state.globalFilter}
+          globalFilter={globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
       </div>
-      <Table bordered {...getTableProps()}>
-        <thead>
-          <tr />
+      <div className='table' {...getTableProps()}>
+        <div >
           {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <div {...headerGroup.getHeaderGroupProps()} className='tr'>
               {headerGroup.headers.map((column, i) => {
                 // three new addition to column: isSorted, isSortedDesc, getSortByToggleProps
                 const {
@@ -115,45 +123,72 @@ const ReactTable = ({ columns, data }) => {
                   isSortedDesc,
                   getSortByToggleProps,
                   // filter,
-                  canFilter
+                  canFilter,
+                  //resizer
+                  isResizing,
+                  getResizerProps,
                 } = column;
                 const extraClass = isSorted
                   ? isSortedDesc
                     ? "desc"
                     : "asc"
                   : "";
+                const { onClick, ...rest } = getHeaderProps(getSortByToggleProps())
                 return (
-                  <th
+                  <div
                     key={`th-${i}`}
-                    className={extraClass}
-                    // getHeaderProps now receives a function
+                    className={`${extraClass} th`}
+                    {...rest}
+                  // getHeaderProps now receives a function
                   >
-                    <div {...getHeaderProps(getSortByToggleProps())}>
+                    <div onClick={onClick}>
                       {render("Header")}
                     </div>
+                    {/* resizer div */}
+                    <div
+                      {...getResizerProps()}
+                      className={`resizer ${isResizing ? 'isResizing' : ''}`}
+                    />
                     {/* Render the columns filter UI */}
                     <div>{canFilter ? render("Filter") : null}</div>
-                  </th>
+                  </div>
                 );
               })}
-            </tr>
+            </div>
           ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
+        </div>
+        <div {...getTableBodyProps()} >
           {rows.map((row, i) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                  );
-                })}
-              </tr>
+              <React.Fragment  key={`rt-tb-trs${i}`}>
+                <div className="tr" {...row.getRowProps()}>
+                  {row.cells.map(cell => {
+                    return (
+                      <div {...cell.getCellProps()} className="td">{cell.render("Cell")}</div>
+                    );
+                  })}
+                </div>
+                {row.isExpanded && isExpandable ? (
+                  <div className="tr">
+                    <div>
+                      {/*
+                              Inside it, call our renderRowSubComponent function. In reality,
+                              you could pass whatever you want as props to
+                              a component like this, including the entire
+                              table instance. But for this example, we'll just
+                              pass the row
+                            */}
+                      {renderRowSubComponent({ row })}
+                    </div>
+                  </div>
+                ) : null}
+              </React.Fragment>
+
             );
           })}
-        </tbody>
-      </Table>
+        </div>
+      </div>
     </div>
   );
 };
