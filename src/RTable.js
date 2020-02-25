@@ -1,6 +1,6 @@
 import React from "react";
 import { Table } from "react-bootstrap";
-import { useTable, useSortBy, useFilters } from "react-table";
+import { useTable, useSortBy, useFilters, useGlobalFilter } from "react-table";
 import CustomInput from "./CustomInput";
 
 window.Date.prototype.isValid = function() {
@@ -72,7 +72,10 @@ const ReactTable = ({ columns, data }) => {
     getTableBodyProps,
     headerGroups,
     rows,
-    prepareRow
+    prepareRow,
+    state,
+    setGlobalFilter,
+    visibleColumns
   } = useTable(
     {
       columns,
@@ -82,61 +85,76 @@ const ReactTable = ({ columns, data }) => {
     },
     // hook for filters
     useFilters,
+    useGlobalFilter,
     // hook for sorting
     useSortBy
   );
-  console.log(defaultColumn);
+  console.log(visibleColumns);
   return (
-    <Table bordered {...getTableProps()}>
-      <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column, i) => {
-              // three new addition to column: isSorted, isSortedDesc, getSortByToggleProps
-              const {
-                render,
-                getHeaderProps,
-                isSorted,
-                isSortedDesc,
-                getSortByToggleProps,
-                // filter,
-                canFilter
-              } = column;
-              const extraClass = isSorted
-                ? isSortedDesc
-                  ? "desc"
-                  : "asc"
-                : "";
-              return (
-                <th
-                  key={`th-${i}`}
-                  className={extraClass}
-                  // getHeaderProps now receives a function
-                >
-                  <div {...getHeaderProps(getSortByToggleProps())}>
-                    {render("Header")}
-                  </div>
-                  {/* Render the columns filter UI */}
-                  <div>{canFilter ? render("Filter") : null}</div>
-                </th>
-              );
-            })}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map(cell => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+    <div>
+      <div
+        className="p-1 border-0 d-flex justify-content-end"
+        colSpan={visibleColumns.length}
+      >
+        <GlobalFilter
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </div>
+      <Table bordered {...getTableProps()}>
+        <thead>
+          <tr />
+          {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column, i) => {
+                // three new addition to column: isSorted, isSortedDesc, getSortByToggleProps
+                const {
+                  render,
+                  getHeaderProps,
+                  isSorted,
+                  isSortedDesc,
+                  getSortByToggleProps,
+                  // filter,
+                  canFilter
+                } = column;
+                const extraClass = isSorted
+                  ? isSortedDesc
+                    ? "desc"
+                    : "asc"
+                  : "";
+                return (
+                  <th
+                    key={`th-${i}`}
+                    className={extraClass}
+                    // getHeaderProps now receives a function
+                  >
+                    <div {...getHeaderProps(getSortByToggleProps())}>
+                      {render("Header")}
+                    </div>
+                    {/* Render the columns filter UI */}
+                    <div>{canFilter ? render("Filter") : null}</div>
+                  </th>
+                );
               })}
             </tr>
-          );
-        })}
-      </tbody>
-    </Table>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row, i) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map(cell => {
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </Table>
+    </div>
   );
 };
 
