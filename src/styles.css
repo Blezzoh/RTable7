@@ -1,0 +1,11 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.table .asc {
+  border-top: 5px solid gray !important;
+}
+.table .desc {
+  border-bottom: 5px solid gray !important;
+}
