@@ -40,6 +40,9 @@ const ColumnFilter = ({ column: { filterValue, setFilter, filter } }) => {
 /**
  * As in the previous versions, any react table needs colums where at the core we have a field Header, and accessor
  * As in the previous versions, a react table has data that consist of an array of JSONs
+ * loadMoreRows: this is the function to be called when new rows needs to be added
+ * rowCount: the maximum number of rows we can have
+ * height: height of the table body. If not passsed the row height will be 600 px
  */
 const ReactTableInfinite = ({ columns, data, loadMoreRows, rowCount, height }) => {
     // functions to run when a column is filtered depending on the type
@@ -176,9 +179,13 @@ const ReactTableInfinite = ({ columns, data, loadMoreRows, rowCount, height }) =
                 </div>
                 <div {...getTableBodyProps()} className='tbody' >
                     <InfiniteLoader
+                        // this function returns true if the row is already loaded
                         isRowLoaded={isRowLoaded}
+                        // function to load more rows
                         loadMoreRows={loadMoreRows}
+                        // number of rows
                         rowCount={rowCount}
+                        // the 
                         threshold={20}
                     >
                         {({ onRowsRendered, registerChild }) => (
