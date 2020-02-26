@@ -185,7 +185,7 @@ const ReactTableInfinite = ({ columns, data, loadMoreRows, rowCount, height }) =
                         loadMoreRows={loadMoreRows}
                         // number of rows
                         rowCount={rowCount}
-                        // the 
+                        // threshold to start loading new data
                         threshold={20}
                     >
                         {({ onRowsRendered, registerChild }) => (
