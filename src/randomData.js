@@ -2,7 +2,7 @@ import Chance from "chance";
 import styled from 'styled-components';
 import React from 'react'
 
-const makeRow =() => {
+const makeRow = () => {
   const chance = new Chance();
   return {
     first: chance.name(),
@@ -28,7 +28,7 @@ export const rt7Expander = {
 export default num => {
   let arr = [];
   for (let i = 0; i < num; i++) {
-    arr.push({...makeRow(), });
+    arr.push({ ...makeRow(), });
   }
   return arr;
 };
@@ -58,7 +58,12 @@ padding: 1rem;
 .table {
   display: inline-block;
   border-spacing: 0;
-  border: 1px solid black;
+  border: 1px solid #dee2e6;
+  position: relative;
+  .thead{
+    overflow-y: scroll;
+    overflow-x: hidden
+  }
   .tr {
     :last-child {
       .td {
@@ -70,8 +75,8 @@ padding: 1rem;
   .td {
     margin: 0;
     padding: 0.5rem;
-    border-bottom: 1px solid black;
-    border-right: 1px solid black;
+    border-bottom: 1px solid #dee2e6;
+    border-right: 1px solid #dee2e6;
     ${'' /* In this example we use an absolutely position resizer,
      so this is required. */}
     position: relative;
