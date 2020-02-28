@@ -27,9 +27,9 @@ export default class App extends React.Component {
     const {data} = this.state
     return (
       <div className="App">
-        {/* <Styles>
+        <Styles>
           <RTable columns={headers} data={data} isExpandable={true} renderRowSubComponent={renderRowSubComponent} />
-        </Styles> */}
+        </Styles>
         <Styles>
           <RTableInfinite rowCount={1000} columns={headers} data={data} loadMoreRows={this.addMoreData} />
         </Styles>
