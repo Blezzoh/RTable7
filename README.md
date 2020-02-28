@@ -20,3 +20,19 @@ ReactTableInfinite.propTypes = {
 ```
 
 
+```
+ReactTable.propTypes = {
+  // Same as the previous versions
+  columns: PropTypes.array.isRequired,
+  // Same as the previous versions
+  data: PropTypes.array.isRequired,
+  // Function that renders a subcomponent,
+  // in this case it is receiving a json containing a row, feel free to modify it
+  renderRowSubComponent: PropTypes.func,
+  // Indicates if the table row has a subcomponent. By default false
+  // if it is true, renderRowSubComponent should be defined
+  isExpandable: PropTypes.bool
+};
+```
+
+
