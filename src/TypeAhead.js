@@ -4,7 +4,7 @@ import 'react-bootstrap-typeahead/css/Typeahead.css'
 import PropTypes from 'prop-types'
 
 const CustomTypeAhead = (props) => {
-    const {options , selected , handleSelect , idKey, isAllSelected} = props
+    const {options , selected , handleSelect , idKey, isAllSelected,renderLabel} = props
     const getDefaults = () =>{
         if(selected.includes('all')){
             return options
@@ -19,10 +19,9 @@ const CustomTypeAhead = (props) => {
         <Typeahead
             id='custom-typeahead'
             multiple
-            allowNew
             selected={getDefaults()}
             bsSize='small'
-            labelKey={'label'}
+            labelKey={renderLabel}
             options={[
                 { [idKey]: 'all', label: 'Add/Remove All' },
                 ...options
@@ -66,7 +65,9 @@ CustomTypeAhead.propTypes = {
     // array of idKeys that are selected
     selected: PropTypes.array,
     // boolean to indicate if all the items are selected
-    isAllSelected: PropTypes.bool
+    isAllSelected: PropTypes.bool,
+    // function to return what the label would be
+    renderLabel: PropTypes.func
 }
 
 CustomTypeAhead.defaultProps = {
@@ -74,7 +75,8 @@ CustomTypeAhead.defaultProps = {
     options: [],
     handleSelect: (d) => null,
     selected: [],
-    isAllSelected: false
+    isAllSelected: false,
+    renderLabel: (d) => `${d.label}`
 }
 
 export default CustomTypeAhead
