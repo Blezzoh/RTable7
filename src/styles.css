@@ -9,3 +9,7 @@
 .table .desc {
   border-bottom: 5px solid gray !important;
 }
+
+.rbt-input-main, .rbt-input-multi{
+  border-radius: 0px !important
+}

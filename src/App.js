@@ -100,6 +100,7 @@ export default class App extends React.Component {
                   handleSelect={d => this.handleSelect(d)}
                   options={this.state.options}
                   isAllSelected={isAllSelected}
+                  placeholder={'select'}
                 />
               </Col>
             </Row>
