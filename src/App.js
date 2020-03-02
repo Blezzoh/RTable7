@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import "./styles.css";
 import "bootstrap/dist/css/bootstrap.css";
-import random, { headers, Styles } from "./randomData";
+import random, { headers, Styles } from "./data";
 import RTable from "./RTable";
-import RTableInfinite from './RTableInfinite'
-import randomData from "./randomData";
+import RTableInfinite from "./RTableInfinite";
+import randomData from "./data";
+import { Tabs, Tab } from "react-bootstrap";
 
 const renderRowSubComponent = () => {
   const data = random(4);
@@ -12,28 +13,44 @@ const renderRowSubComponent = () => {
     <Styles>
       <RTable columns={headers} data={data} />
     </Styles>
-  )
-}
+  );
+};
 export default class App extends React.Component {
-  state ={
+  state = {
     data: random(200)
-  }
+  };
   addMoreData = ({ startIndex, stopIndex }) => {
-    let {data} = this.state
-    data = [...data, ...randomData(stopIndex - startIndex + 1)]
-    this.setState({data})
-  }
-  render(){
-    const {data} = this.state
+    let { data } = this.state;
+    data = [...data, ...randomData(stopIndex - startIndex + 1)];
+    this.setState({ data });
+  };
+  render() {
+    const { data } = this.state;
     return (
       <div className="App">
-        {/* <Styles>
-          <RTable columns={headers} data={data} isExpandable={true} renderRowSubComponent={renderRowSubComponent} />
-        </Styles> */}
-        <Styles>
-          <RTableInfinite rowCount={1000} columns={headers} data={data} loadMoreRows={this.addMoreData} />
-        </Styles>
+        <Tabs defaultActiveKey="custom" id="uncontrolled-tab-example">
+          <Tab eventKey="custom" title="Custom">
+            <Styles>
+              <RTable
+                columns={headers}
+                data={data}
+                isExpandable={true}
+                renderRowSubComponent={renderRowSubComponent}
+              />
+            </Styles>
+          </Tab>
+          <Tab eventKey="infinite" title="Infinite Scroll">
+            <Styles>
+              <RTableInfinite
+                rowCount={1000}
+                columns={headers}
+                data={data}
+                loadMoreRows={this.addMoreData}
+              />
+            </Styles>
+          </Tab>
+        </Tabs>
       </div>
-    )
+    );
   }
 }
