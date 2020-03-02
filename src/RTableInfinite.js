@@ -2,7 +2,6 @@ import React from "react";
 import { useTable, useSortBy, useFilters, useGlobalFilter, useFlexLayout, useResizeColumns } from "react-table";
 import CustomInput from "./CustomInput";
 import { InfiniteLoader, List as FixedSizeList, AutoSizer } from 'react-virtualized';
-// import 'react-virtualized/styles.css';
 
 window.Date.prototype.isValid = function () {
     // An invalid date object returns NaN for getTime() and NaN is the only
