@@ -206,7 +206,7 @@ ReactTableInfinite.propTypes = {
   // this is meant to load more data and add it to the data prop
   loadMoreRows: PropTypes.func.isRequired,
   // the row count
-  rowCount: PropTypes.func.isRequired,
+  rowCount: PropTypes.number.isRequired,
   // height of the reac-table body by default it will be 800px
   height: PropTypes.number
 };
