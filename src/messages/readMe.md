@@ -27,7 +27,7 @@ import ChatComponent from 'react-bootstrap-chat-ui'
 
 ``` 
 ChatComponent.propTypes = {
-    // array of messages each containing at these keys
+    // array of message object, each containing at the keys displayed.
     messages: PropTypes.arrayOf(
         PropTypes.shape({
         body: PropTypes.string,
