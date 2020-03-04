@@ -3,13 +3,13 @@
   text-align: center;
 }
 
-.table .asc {
-  border-top: 5px solid gray !important;
-}
-.table .desc {
-  border-bottom: 5px solid gray !important;
-}
-
 .rbt-input-main, .rbt-input-multi{
   border-radius: 0px !important
+}
+.cursor-pointer:hover{
+  cursor: pointer;
+}
+.hoverable:hover{
+  background: #007bff;
+  color: white
 }

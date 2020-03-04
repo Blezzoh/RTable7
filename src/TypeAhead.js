@@ -4,7 +4,7 @@ import 'react-bootstrap-typeahead/css/Typeahead.css'
 import PropTypes from 'prop-types'
 
 const CustomTypeAhead = (props) => {
-    const {options , selected , handleSelect , idKey, isAllSelected,renderLabel, placeholder} = props
+    let {options , selected , handleSelect , idKey, isAllSelected,renderLabel, placeholder, defaultLabel,allowAllSelection} = props
     const getDefaults = () =>{
         if(selected.includes('all')){
             return options
@@ -14,7 +14,10 @@ const CustomTypeAhead = (props) => {
         }
         return []
     }
-    console.log(isAllSelected)
+    options = allowAllSelection ? [
+        { [idKey]: 'all', [defaultLabel]: 'Add/Remove All' },
+        ...options
+    ] : options
     return (
         <Typeahead
             id='custom-typeahead'
@@ -23,10 +26,7 @@ const CustomTypeAhead = (props) => {
             selected={getDefaults()}
             bsSize='small'
             labelKey={renderLabel}
-            options={[
-                { [idKey]: 'all', label: 'Add/Remove All' },
-                ...options
-            ]}
+            options={options}
             // will provide you the selected input 
             onChange={data => {
                 for (const d of data) {
@@ -45,7 +45,7 @@ const CustomTypeAhead = (props) => {
                     {results.map((result, index) => {
                         return (
                             <MenuItem option={result} position={index} key={result[idKey]}>
-                                {result.label}
+                                {renderLabel(result)}
                             </MenuItem>
                         )
                     })}
@@ -70,16 +70,21 @@ CustomTypeAhead.propTypes = {
     // function to return what the label would be
     renderLabel: PropTypes.func,
     // placeholder
-    placeholder: PropTypes.string
+    placeholder: PropTypes.string,
+    // key to be used for all
+    defaultLabel: PropTypes.string,
+    // should allow to select all at once
+    allowAllSelection: PropTypes.bool
 }
 
 CustomTypeAhead.defaultProps = {
     idKey: 'id',
+    allowAllSelection: true,
     options: [],
     handleSelect: (d) => null,
     selected: [],
     isAllSelected: false,
-    renderLabel: (d) => `${d.label}`,
+    defaultLabel:'label',
     placeholder: ''
 }
 

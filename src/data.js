@@ -3,13 +3,33 @@ import styled from "styled-components";
 import React from "react";
 import CustomInput from "./CustomInput";
 
+
+const SomeFilter = ({
+  column: { filterValue, setFilter}
+}) => {
+  return (
+    <CustomInput
+      value={filterValue || ""}
+      onChange={e => {
+        setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
+      }}
+      placeholder={`Age greater than...`}
+    />
+  );
+};
+
 const makeRow = () => {
   const chance = new Chance();
   return {
+    age: chance.age(),
     first: chance.name(),
     last: chance.last(),
     birthday: chance.birthday({ string: true }),
-    zip: chance.zip()
+    zip: chance.zip(),
+    anotherfirst: chance.name(),
+    anotherlast: chance.last(),
+    anotherbirthday: chance.birthday({ string: true }),
+    anotherzip: chance.zip(),
   };
 };
 export const rt7Expander = {
@@ -36,6 +56,20 @@ export default num => {
 
 export const headers = [
   {
+    // Make an expander cell
+    Header: () => null, // No header
+    id: "expander", // It needs an ID
+    width: 25,
+    Cell: ({ row }) => (
+      // Use Cell to render an expander for each row.
+      // We can use the getToggleRowExpandedProps prop-getter
+      // to build the expander.
+      <span {...row.getToggleRowExpandedProps()}>
+        {row.isExpanded ? "▼" : "►"}
+      </span>
+    )
+  },
+  {
     Header: "First",
     accessor: "first"
   },
@@ -51,8 +85,15 @@ export const headers = [
   {
     Header: "Zip",
     accessor: "zip"
-  }
+  },
 ];
+
+export const ageHeader = {
+  Header: "Age",
+  accessor: "age",
+  filter:'greater',
+  Filter: SomeFilter
+}
 
 export const Styles = styled.div`
   padding: 1rem;
@@ -61,9 +102,22 @@ export const Styles = styled.div`
     border-spacing: 0;
     border: 1px solid #dee2e6;
     position: relative;
-    .thead {
+    overflow-x: visible;
+    .thead-infinite {
       overflow-y: scroll;
-      overflow-x: hidden;
+    }
+    .asc {
+      border-top: 5px solid gray !important;
+    }
+    .desc {
+      border-bottom: 5px solid gray !important;
+    }
+    .thead{
+    }
+    .tbody{
+    }
+    .tbody-infinite{
+
     }
     .tr {
       :last-child {
@@ -110,7 +164,6 @@ window.Date.prototype.isValid = function() {
 
 // value and onChange function
 export const GlobalFilter = ({ globalFilter, setGlobalFilter }) => {
-  console.log(setGlobalFilter, "global filter");
   return (
     <CustomInput
       value={globalFilter || ""}
@@ -122,16 +175,25 @@ export const GlobalFilter = ({ globalFilter, setGlobalFilter }) => {
   );
 };
 
-export const ColumnFilter = ({
-  column: { filterValue, setFilter, filter }
-}) => {
-  return (
-    <CustomInput
-      value={filterValue || ""}
-      onChange={e => {
-        setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
-      }}
-      placeholder={`Search ${filter ? filter : ""}...`}
-    />
-  );
-};
+
+
+export const filterTypes = {
+    text: (rows, id, filterValue) => {
+      return rows.filter(row => {
+        const rowValue = row.values[id];
+        return rowValue !== undefined
+          ? String(rowValue)
+            .toLowerCase()
+            .startsWith(String(filterValue).toLowerCase())
+          : true;
+      });
+    },
+    greater: (rows, id, filterValue) => {
+      return rows.filter(row => {
+        const rowValue = row.values[id];
+        return rowValue !== undefined && !Number.isNaN(Number(rowValue)) && !Number.isNaN(Number(filterValue))
+          ? Number(rowValue) > Number(filterValue)
+          : true;
+      });
+    },
+  };

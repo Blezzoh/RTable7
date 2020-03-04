@@ -1,0 +1,55 @@
+/*1. single chat entry*/
+/* time of the message */
+.single-chat-time{
+    width: 12em;
+    font-size: 0.8rem;
+}
+/* wrapper the a single message */
+.single-chat{
+
+}
+/* text of the message */
+.single-chat-text{
+
+}
+
+/*2. messages group*/
+/*div to a single message*/
+.chat-message-list{
+
+}
+/*3. input and button to the right*/
+/* wrapper to the input*/
+.chat-input-wrapper{
+
+}
+/*the input itself*/
+.chat-input{
+
+}
+/*span that wrapps all the button*/
+.chat-button-wrapper{
+
+}
+/*stop button*/
+.chat-button-stop{
+    
+}
+/*send button*/
+.chat-button-send{
+
+}
+/*4. the component that has all. aka Chat Component*/
+/* wraps everything */
+.chat-component{
+    max-height: 1000px;
+    overflow-y: scroll;
+
+}
+/* wraps the message groups */
+.chat-messages-container{
+}
+/* wraps the input */
+.chat-component-bottom{
+
+}

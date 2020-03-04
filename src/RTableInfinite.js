@@ -1,20 +1,11 @@
 import React from "react";
 import {
-  useTable,
-  useSortBy,
-  useFilters,
-  useGlobalFilter,
-  useFlexLayout,
-  useResizeColumns
-} from "react-table";
-import {
   InfiniteLoader,
   List as FixedSizeList,
   AutoSizer
 } from "react-virtualized";
-// import 'react-virtualized/styles.css';
-import { ColumnFilter, GlobalFilter } from "./data";
 import PropTypes from "prop-types";
+import ReactTable from './RTable'
 /**
  * As in the previous versions, any react table needs colums where at the core we have a field Header, and accessor
  * As in the previous versions, a react table has data that consist of an array of JSONs
@@ -27,69 +18,17 @@ const ReactTableInfinite = ({
   data,
   loadMoreRows,
   rowCount,
-  height
+  height,
+  filterTypes,
+  ColumnFilter, GlobalFilter,
+  allowColumnFilter, allowGlobalFilter,
+  threshold
 }) => {
-  // functions to run when a column is filtered depending on the type
-  const filterTypes = {
-    year: (rows, id, filterValue) => {
-      return rows.filter(row => {
-        const rowValue = row.values[id];
-        return rowValue !== undefined &&
-          Number(filterValue) &&
-          new Date(rowValue) &&
-          new Date(rowValue).isValid()
-          ? new Date(rowValue).getFullYear() === Number(filterValue)
-          : true;
-      });
-    },
-    text: (rows, id, filterValue) => {
-      return rows.filter(row => {
-        const rowValue = row.values[id];
-        return rowValue !== undefined
-          ? String(rowValue)
-              .toLowerCase()
-              .startsWith(String(filterValue).toLowerCase())
-          : true;
-      });
-    }
-  };
-  const defaultColumn = React.useMemo(
-    () => ({
-      // Let's set up our default Filter UI
-      Filter: ColumnFilter,
-      minWidth: 25,
-      maxWidth: 400
-    }),
-    []
-  );
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    state: { globalFilter },
-    setGlobalFilter
-  } = useTable(
-    {
-      columns,
-      data,
-      defaultColumn,
-      filterTypes
-    },
-    // hooks for filters
-    useFilters,
-    useGlobalFilter,
-    // hook for sorting
-    useSortBy,
-    // hooks for resizing
-    useFlexLayout,
-    useResizeColumns
-  );
-  const isRowLoaded = ({ index }) => {
+  const isRowLoaded = ({ index }, rows) => {
     return !!rows[index];
   };
-  const RenderRow = ({ key, index, style }) => {
+  const RenderRow = (rowArgs, rows,prepareRow) => {
+    const { key, index, style } = rowArgs
     const row = rows[index];
     if (!row) {
       return <div key={key} className="tr bg-gray" />;
@@ -107,94 +46,47 @@ const ReactTableInfinite = ({
       </div>
     );
   };
-  return (
-    <div>
-      <div className="p-1 border-0 d-flex justify-content-end">
-        <GlobalFilter
-          globalFilter={globalFilter}
-          setGlobalFilter={setGlobalFilter}
-        />
-      </div>
-      <div className="table" {...getTableProps()}>
-        <div className="thead">
-          {headerGroups.map(headerGroup => (
-            <div {...headerGroup.getHeaderGroupProps()} className="tr">
-              {headerGroup.headers.map((column, i) => {
-                // three new addition to column: isSorted, isSortedDesc, getSortByToggleProps
-                const {
-                  render,
-                  getHeaderProps,
-                  isSorted,
-                  isSortedDesc,
-                  getSortByToggleProps,
-                  //resizer
-                  isResizing,
-                  getResizerProps,
-                  // filter
-                  canFilter
-                } = column;
-                const extraClass = isSorted
-                  ? isSortedDesc
-                    ? "desc"
-                    : "asc"
-                  : "";
-                const { onClick, ...rest } = getHeaderProps(
-                  getSortByToggleProps()
-                );
-                return (
-                  <div
-                    key={`th-${i}`}
-                    className={`${extraClass} th`}
-                    {...rest}
-                    // getHeaderProps now receives a function
-                  >
-                    <div onClick={onClick}>{render("Header")}</div>
-                    {/* resizer div */}
-                    <div
-                      {...getResizerProps()}
-                      className={`resizer ${isResizing ? "isResizing" : ""}`}
-                    />
-                    {/* Render the columns filter UI */}
-                    <div>{canFilter ? render("Filter") : null}</div>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-        <div {...getTableBodyProps()} className="tbody">
-          <InfiniteLoader
-            // this function returns true if the row is already loaded
-            isRowLoaded={isRowLoaded}
-            // function to load more rows
-            loadMoreRows={loadMoreRows}
-            // number of rows
-            rowCount={rowCount}
-            // threshold to start loading new data
-            threshold={20}
-          >
-            {({ onRowsRendered, registerChild }) => (
-              <AutoSizer>
-                {({ width }) => (
-                  <FixedSizeList
-                    className="border"
-                    height={height ? height : 600}
-                    onRowsRendered={onRowsRendered}
-                    ref={registerChild}
-                    rowCount={rowCount}
-                    rowHeight={35}
-                    // renders row
-                    rowRenderer={RenderRow}
-                    width={width}
-                  />
-                )}
-              </AutoSizer>
-            )}
-          </InfiniteLoader>
-        </div>
-      </div>
-    </div>
-  );
+  return <ReactTable
+    isExpandable={false}
+    data={data}
+    columns={columns} allowGlobalFilter={allowGlobalFilter}
+    filterTypes={filterTypes} allowColumnFilter={allowColumnFilter}
+    ColumnFilter={ColumnFilter} GlobalFilter={GlobalFilter}
+    allowInfiniteScroll={true}
+    renderBody={(rows, prepareRow) => {
+      return (
+        <InfiniteLoader
+          // this function returns true if the row is already loaded
+          isRowLoaded={rowArgs => isRowLoaded(rowArgs, rows)}
+          // function to load more rows
+          loadMoreRows={loadMoreRows}
+          // number of rows
+          rowCount={rowCount}
+          // threshold to start loading new data
+          threshold={threshold}
+        >
+          {({ onRowsRendered, registerChild }) => (
+            <AutoSizer>
+              {({ width }) => (
+                <FixedSizeList
+                  className="border"
+                  height={height ? height : 600}
+                  onRowsRendered={onRowsRendered}
+                  ref={registerChild}
+                  rowCount={rowCount}
+                  rowHeight={35}
+                  // renders row
+                  rowRenderer={rowArgs => RenderRow(rowArgs, rows, prepareRow)}
+                  width={width}
+                />
+              )}
+            </AutoSizer>
+          )}
+        </InfiniteLoader>
+      )
+    }}
+  />
+
 };
 
 ReactTableInfinite.propTypes = {
@@ -205,10 +97,24 @@ ReactTableInfinite.propTypes = {
   // function that receives an json { startIndex, stopIndex }
   // this is meant to load more data and add it to the data prop
   loadMoreRows: PropTypes.func.isRequired,
+  // Threshold at which to pre-fetch data. A threshold X means that data will start loading when a user scrolls within X rows. Defaults to 15.
+  threshold: PropTypes.number,
   // the row count
   rowCount: PropTypes.number.isRequired,
   // height of the reac-table body by default it will be 800px
-  height: PropTypes.number
+  height: PropTypes.number,
+  ColumnFilter: PropTypes.func,
+  // Filter for all data : this is a function that returns a jsx(prerably an input)
+  GlobalFilter: PropTypes.func,
+  allowColumnFilter: PropTypes.bool,
+  allowGlobalFilter: PropTypes.bool,
+  filterTypes: PropTypes.objectOf(PropTypes.func),
+
 };
+
+ReactTableInfinite.defaultProps = {
+  isExpandable: false,
+  threshold: 15,
+}
 
 export default ReactTableInfinite;
