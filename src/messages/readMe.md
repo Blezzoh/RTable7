@@ -14,7 +14,7 @@ You can use the indepent components to make your own chat ui, or use the already
 
 This is the default component in this package.it can be imported like this:
 
-``` 
+```javascript
 import ChatComponent from 'react-bootstrap-chat-ui'
 ```
 
@@ -25,7 +25,7 @@ import ChatComponent from 'react-bootstrap-chat-ui'
 
 ***PropTypes***
 
-``` 
+```javascript 
 ChatComponent.propTypes = {
     // array of message object, each containing at the keys displayed.
     messages: PropTypes.arrayOf(
@@ -71,7 +71,7 @@ A ChatInput is the input where a user can send a new chat message.
 
 ***PropTypes***
 
-``` 
+```javascript
 ChatInput.propTypes = {
     // icon to be used on the send button, can be a text or a node
     iconSend: PropTypes.node, 
@@ -94,7 +94,7 @@ This is view that display a single message chat. It display this at the right if
 
 ***PropTypes***
 
-```
+```javascript
 SingleChat.propTypes ={
     message: PropTypes.shape({
         body: PropTypes.string,
@@ -114,7 +114,7 @@ This is component display a list of SingleChats.
 
 ***PropTypes***
 
-```
+```javascript
 ChatMessagesGroup.propTypes ={
     messages: PropTypes.array,
     agentUser: PropTypes.any,
