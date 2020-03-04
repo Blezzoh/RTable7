@@ -124,4 +124,4 @@ ChatMessagesGroup.propTypes ={
 
 ### 2. Example
 
-In the example folder there is an example of the chat component in use. There is also a css boiler plate just in case the use wants to change style the component differently.
+In the example folder there is an example of the chat component in use. There is also a css boiler plate, just in case the user wants to change style the component differently.
